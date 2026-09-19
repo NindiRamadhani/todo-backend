@@ -11,6 +11,25 @@ export const getTodos = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
+// GET /api/todos/:id - Ambil satu todo berdasarkan ID
+export const getTodoById = async (req: Request, res: Response): Promise<void> => {
+    const { id } = req.params;       // Ambil id dari URL, contoh: /todos/14 -> id = "14"
+    const userId = res.locals.userId;
+    try {
+        const todo = await TodoModel.getById(Number(id), userId);
+
+        // Jika undefined, berarti todo tidak ditemukan atau bukan milik user ini
+        if (!todo) {
+            res.status(404).json({ success: false, message: 'Tugas tidak ditemukan!' });
+            return;
+        }
+
+        res.status(200).json({ success: true, data: todo });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Gagal mengambil data.' });
+    }
+};
+
 export const createTodo = async (req: Request, res: Response): Promise<void> => {
     const { task } = req.body;
     const userId = res.locals.userId; // Ambil dari res.locals
